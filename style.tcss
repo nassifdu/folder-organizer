@@ -1,4 +1,34 @@
 
-#left-panel {
-    width: 10%;
+.side-panel {
+    width: 25%;
+    margin: 1;
+}
+
+.side-panel > * {
+    width: 100%;
+}
+
+#main-tree {
+    height: 100%
+}
+
+Button {
+    background: $secondary;
+}
+
+.dirwidget {
+    border: heavy white;
+    height: auto;
+}
+
+.dirwidget-extensions {
+    color: gray;
+}
+
+.dirwidget-button {
+    margin-left: 1;
+}
+
+.dirwidget-button-container {
+    margin-right: 1;
 }
