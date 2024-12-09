@@ -32,3 +32,7 @@ Button {
 .dirwidget-button-container {
     margin-right: 1;
 }
+
+.log {
+    height: auto;
+}

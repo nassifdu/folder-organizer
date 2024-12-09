@@ -5,8 +5,18 @@ from os.path import isdir
 home = Path.home()
 
 from textual.app import App, ComposeResult
-from textual.widgets import Header, DirectoryTree, Static, Button, Input
+from textual.widgets import Header, DirectoryTree, Static, Button, Input, RichLog
 from textual.containers import Horizontal, Vertical, VerticalScroll, Container
+
+from os import system, listdir
+
+def move(file, path):
+    system(f'move {file} {path}')	
+
+def move_with_extension(folder, extension):
+    for file in listdir(folder):
+        if file.endswith(extension):
+            move(file, folder)
 
 class DirectoryWidget(Vertical):
     def __init__(self, dir=str(home), **kwargs):
@@ -39,12 +49,14 @@ class FolderOrganizer(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.current_path = str(home)
+        self.inp_texts = {}
     def compose(self) -> ComposeResult:
         yield Header()
 
         self.dirtree = FolderDirectoryTree(home, id='main-tree')
         self.left_panel = Vertical(
             Button(label='Organize selected folder', id='organize-button'),
+            RichLog(id='log'),
             id='left-panel', classes='side-panel'
         )
         self.right_panel = RightPanel()
@@ -55,11 +67,18 @@ class FolderOrganizer(App):
             self.right_panel
         )
     
+    def on_input_changed(self, event: Input.Changed) -> None:
+        self.inp_texts[event.input.id] = event.value
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == 'add-dir-button':
             self.right_panel.dirs.mount(
                 DirectoryWidget(dir=str(self.current_path))
             )
+        if event.button.id == 'organize-button':
+            for dirwidget in self.right_panel.dirs.query(DirectoryWidget):
+                for ext in self.inp_texts[dirwidget.id].split(', '):
+                    move_with_extension(dirwidget.directory._content, ext)
 
     def on_directory_tree_directory_selected(self, event: DirectoryTree.DirectorySelected) -> None:
         self.current_path = event.path
